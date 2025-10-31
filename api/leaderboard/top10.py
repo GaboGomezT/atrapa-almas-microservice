@@ -5,6 +5,14 @@ from .utils import LeaderboardError, fetch_top_scores
 
 
 class handler(BaseHTTPRequestHandler):
+    """HTTP handler that returns the top leaderboard scores."""
+
+    ALLOWED_METHODS = "GET, OPTIONS"
+
+    def do_OPTIONS(self):
+        self.send_response(204)
+        self.send_header("Content-Length", "0")
+        self.end_headers()
 
     def do_GET(self):
         try:
@@ -25,4 +33,10 @@ class handler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(response_bytes)))
         self.end_headers()
         self.wfile.write(response_bytes)
+
+    def end_headers(self):
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", self.ALLOWED_METHODS)
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+        super().end_headers()
 

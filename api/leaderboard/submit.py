@@ -5,6 +5,14 @@ from .utils import LeaderboardError, submit_score
 
 
 class handler(BaseHTTPRequestHandler):
+    """HTTP handler for score submissions."""
+
+    ALLOWED_METHODS = "POST, OPTIONS"
+
+    def do_OPTIONS(self):
+        self.send_response(204)
+        self.send_header("Content-Length", "0")
+        self.end_headers()
 
     def do_POST(self):
         content_length = int(self.headers.get("Content-Length", 0))
@@ -45,4 +53,10 @@ class handler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(response_bytes)))
         self.end_headers()
         self.wfile.write(response_bytes)
+
+    def end_headers(self):
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", self.ALLOWED_METHODS)
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+        super().end_headers()
 

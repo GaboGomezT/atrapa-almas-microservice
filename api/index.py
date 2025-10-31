@@ -3,6 +3,9 @@ from http.server import BaseHTTPRequestHandler
 
 
 class handler(BaseHTTPRequestHandler):
+    """HTTP handler that exposes the leaderboard API entry point."""
+
+    ALLOWED_METHODS = "GET, OPTIONS"
 
     def do_GET(self):
         message = {
@@ -14,6 +17,11 @@ class handler(BaseHTTPRequestHandler):
         }
         self._send_json_response(200, message)
 
+    def do_OPTIONS(self):
+        self.send_response(204)
+        self.send_header("Content-Length", "0")
+        self.end_headers()
+
     def do_POST(self):
         self.send_error(405, "Method Not Allowed")
 
@@ -24,3 +32,9 @@ class handler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(response_bytes)))
         self.end_headers()
         self.wfile.write(response_bytes)
+
+    def end_headers(self):
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", self.ALLOWED_METHODS)
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+        super().end_headers()
